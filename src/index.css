@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Georgia", serif;
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  
+  --color-soft-lilac: #f3e8ff;
+  --color-pastel-pink: #fce7f3;
+  --color-accent-pink: #d946ef;
+  --color-deep-purple: #701a75;
+  --color-white: #ffffff;
+  --color-text-main: #4a044e;
+  --color-text-muted: #86198f;
+  --color-border-theme: #f5d0fe;
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+
+  .bg-sidebar-grad {
+    background: linear-gradient(180deg, var(--color-soft-lilac) 0%, var(--color-pastel-pink) 100%);
+  }
+
+  .bg-main-grad {
+    background: var(--color-white) radial-gradient(circle at top right, var(--color-pastel-pink) 0%, transparent 40%),
+                radial-gradient(circle at bottom left, var(--color-soft-lilac) 0%, transparent 40%);
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--color-white);
+    color: var(--color-text-main);
+    font-family: var(--font-sans);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    color: var(--color-deep-purple);
+  }
+}
