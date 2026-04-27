@@ -16,9 +16,14 @@ export default function ServicesPage() {
     price: 1000,
     icon: 'scissors'
   });
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleSave = () => {
-    if (!formData.name) return;
+    if (!formData.name || formData.name.trim() === '') {
+      setErrorMsg('O nome do serviço é obrigatório.');
+      return;
+    }
+    setErrorMsg('');
     
     if (isEditing) {
       updateService(isEditing, formData);
@@ -27,7 +32,7 @@ export default function ServicesPage() {
       addService(formData);
     }
     
-    setFormData({ name: '', durationMinutes: 60, price: 1000, icon: 'scissors' });
+    setFormData({ name: '', durationMinutes: 60, price: 1000, icon: 'scissors', description: '', image: '' });
   };
 
   const handleEdit = (s: Service) => {
@@ -38,30 +43,44 @@ export default function ServicesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-serif font-medium text-gray-900">Serviços</h1>
-        <p className="text-gray-500 mt-1">Gerencie os serviços oferecidos.</p>
+        <h1 className="text-3xl font-serif font-medium text-white">Serviços</h1>
+        <p className="text-text-muted mt-1">Gerencie os serviços oferecidos.</p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        <Card className="md:col-span-1 h-fit">
-          <h2 className="text-lg font-medium mb-4">{isEditing ? 'Editar Serviço' : 'Adicionar Serviço'}</h2>
-          <div className="space-y-4">
+        <Card className="md:col-span-1 h-fit bg-[#1e293b] border-[#475569]">
+          <h2 className="text-lg font-medium mb-4 text-white">{isEditing ? 'Editar Serviço' : 'Adicionar Serviço'}</h2>
+          <div className="space-y-4 text-text-main">
             <Input 
               label="Nome do Serviço" 
-              value={formData.name} 
-              onChange={e => setFormData({...formData, name: e.target.value})} 
+              value={formData.name || ''} 
+              error={errorMsg}
+              onChange={e => {
+                setFormData({...formData, name: e.target.value});
+                if (errorMsg) setErrorMsg('');
+              }} 
             />
             <Input 
               label="Duração (Minutos)" 
               type="number"
-              value={formData.durationMinutes} 
+              value={formData.durationMinutes || ''} 
               onChange={e => setFormData({...formData, durationMinutes: parseInt(e.target.value) || 0})} 
             />
             <Input 
               label="Preço (MZN)" 
               type="number"
-              value={formData.price} 
+              value={formData.price || ''} 
               onChange={e => setFormData({...formData, price: parseInt(e.target.value) || 0})} 
+            />
+            <Input 
+              label="Descrição (Opcional)" 
+              value={formData.description || ''} 
+              onChange={e => setFormData({...formData, description: e.target.value})} 
+            />
+            <Input 
+              label="URL da Imagem (Opcional)" 
+              value={formData.image || ''} 
+              onChange={e => setFormData({...formData, image: e.target.value})} 
             />
 
             <Button fullWidth onClick={handleSave} className="mt-4">
@@ -70,7 +89,8 @@ export default function ServicesPage() {
             {isEditing && (
               <Button fullWidth variant="ghost" onClick={() => {
                 setIsEditing(null);
-                setFormData({ name: '', durationMinutes: 60, price: 1000, icon: 'scissors' });
+                setFormData({ name: '', durationMinutes: 60, price: 1000, icon: 'scissors', description: '', image: '' });
+                setErrorMsg('');
               }}>
                 Cancelar
               </Button>
@@ -80,10 +100,10 @@ export default function ServicesPage() {
 
         <div className="md:col-span-2 space-y-4">
           {services.map((s, i) => (
-            <AnimatedCard key={s.id} delay={i * 0.1} className="flex flex-col sm:flex-row gap-4 justify-between p-4">
+            <AnimatedCard key={s.id} delay={i * 0.1} className="flex flex-col sm:flex-row gap-4 justify-between p-4 bg-[#1e293b] border border-[#475569]">
               <div>
-                <h3 className="font-medium text-gray-900 text-lg">{s.name}</h3>
-                <p className="text-sm text-gray-500">
+                <h3 className="font-medium text-white text-lg">{s.name || 'Unnamed Service'}</h3>
+                <p className="text-sm text-text-muted">
                   {s.durationMinutes} minutos • {(s.price).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
                 </p>
               </div>

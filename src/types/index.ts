@@ -18,6 +18,8 @@ export interface Service {
   durationMinutes: number;
   price: number;
   icon?: string;
+  description?: string;
+  image?: string;
 }
 
 export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';

@@ -125,10 +125,10 @@ export default function SchedulingPage() {
                     }`}
                   >
                     <div>
-                      <h3 className="font-medium text-gray-900 text-left">{service.name}</h3>
-                      <p className="text-sm text-gray-500 text-left">{service.durationMinutes} min</p>
+                      <h3 className="font-medium text-white text-left text-lg">{service.name || 'Unnamed Service'}</h3>
+                      <p className="text-sm text-text-muted text-left mt-1">{service.durationMinutes} min</p>
                     </div>
-                    <span className="font-medium text-lilac-600">
+                    <span className="font-bold text-accent-pink text-lg bg-[#334155] px-3 py-1.5 rounded-xl border border-[#475569]">
                       {(service.price).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
                     </span>
                   </button>
@@ -242,12 +242,21 @@ export default function SchedulingPage() {
                 <CheckCircle2 className="w-5 h-5 text-lilac-500" /> Praticamente pronto
               </h2>
               
-              <div className="bg-lilac-50/50 rounded-2xl p-4 mb-6">
-                <h3 className="font-medium text-lilac-900 mb-2">Resumo do Agendamento</h3>
-                <div className="space-y-1 text-sm text-lilac-700">
-                  <p><strong>Serviço:</strong> {selectedService?.name} ({(selectedService?.price || 0).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })})</p>
-                  <p><strong>Profissional:</strong> {selectedProf?.name}</p>
-                  <p><strong>Data:</strong> {selectedDate ? format(selectedDate, "dd 'de' MMMM", { locale: ptBR }) : ''} às {selectedTime}</p>
+              <div className="bg-[#1e293b] border border-[#475569] rounded-2xl p-6 mb-6">
+                <h3 className="font-serif text-white mb-4 text-lg">Resumo da Reserva</h3>
+                <div className="space-y-3 text-text-muted">
+                  <p className="flex justify-between items-center bg-[#334155] p-3 rounded-xl">
+                    <strong className="text-white text-sm uppercase tracking-wider">Tratamento:</strong> 
+                    <span className="text-white font-medium">{selectedService?.name || 'Unnamed Service'}</span>
+                  </p>
+                  <p className="flex justify-between items-center bg-[#334155] p-3 rounded-xl">
+                    <strong className="text-white text-sm uppercase tracking-wider">Especialista:</strong> 
+                    <span className="text-white font-medium">{selectedProf?.name}</span>
+                  </p>
+                  <p className="flex justify-between items-center bg-[#334155] p-3 rounded-xl">
+                    <strong className="text-white text-sm uppercase tracking-wider">Data & Hora:</strong> 
+                    <span className="text-accent-pink font-bold">{selectedDate ? format(selectedDate, "dd 'de' MMMM", { locale: ptBR }) : ''} às {selectedTime}</span>
+                  </p>
                 </div>
               </div>
 

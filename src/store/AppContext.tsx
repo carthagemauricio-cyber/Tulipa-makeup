@@ -74,6 +74,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           bookingCode: a.bookingCode || generateBookingCode(),
           status: a.status === 'confirmed' || a.status === 'cancelled' ? a.status : 'pending',
         })) || [];
+
+        // Ensure services are always correctly mapped and formatted
+        parsed.services = parsed.services?.map((s: any) => ({
+          ...s,
+          name: s.name || '',
+          durationMinutes: s.durationMinutes || 60,
+          price: s.price || 0,
+        })) || defaultServices;
         
         return parsed;
       } catch (e) {

@@ -16,7 +16,7 @@ export default function PublicLayout() {
               <Search className="w-4 h-4" />
               <span>Acompanhar</span>
             </Link>
-            <Link to="/admin" className="text-sm font-medium text-accent-pink hover:bg-[#2a1d35] px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5">
+            <Link to="/admin" className="text-sm font-medium text-accent-pink hover:bg-[#334155] px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5">
               <Settings className="w-4 h-4" />
               <span className="hidden sm:inline">Admin</span>
             </Link>

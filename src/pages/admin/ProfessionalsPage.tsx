@@ -172,7 +172,7 @@ export default function ProfessionalsPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-[#1c1524] rounded-[32px] p-8 shadow-2xl border border-border-theme max-h-[90vh] overflow-y-auto"
+              className="relative w-full max-w-2xl bg-[#1e293b] rounded-[32px] p-8 shadow-2xl border border-border-theme max-h-[90vh] overflow-y-auto"
             >
               <button 
                 onClick={handleCloseModal}
@@ -187,7 +187,7 @@ export default function ProfessionalsPage() {
 
               <div className="space-y-6">
                 {/* Image Upload Area */}
-                <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-[24px] bg-[#2a1d35] border border-border-theme">
+                <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-[24px] bg-[#334155] border border-border-theme">
                   <div className="w-24 h-24 rounded-full bg-border-theme border-2 border-accent-pink overflow-hidden flex items-center justify-center shrink-0 shrink-0">
                     {formData.photoUrl ? (
                       <img src={formData.photoUrl} alt="Preview" className="w-full h-full object-cover" />
@@ -253,7 +253,7 @@ export default function ProfessionalsPage() {
                             "px-4 py-2 rounded-full text-sm font-medium border transition-all",
                             isSelected 
                               ? "bg-[rgba(217,70,239,0.15)] border-accent-pink text-accent-pink"
-                              : "bg-[#2a1d35] border-transparent text-text-main hover:border-border-theme"
+                              : "bg-[#334155] border-transparent text-text-main hover:border-border-theme"
                           )}
                         >
                           {isSelected && <CheckCircle2 className="w-4 h-4 inline-block mr-1.5 -mt-0.5" />}
@@ -277,7 +277,7 @@ export default function ProfessionalsPage() {
                              "w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-bold border transition-all",
                              isSelected
                                ? "bg-accent-pink border-accent-pink text-white shadow-[0_4px_12px_rgba(217,70,239,0.3)]"
-                               : "bg-[#2a1d35] border-transparent text-text-muted hover:border-border-theme"
+                               : "bg-[#334155] border-transparent text-text-muted hover:border-border-theme"
                            )}
                          >
                            {day}
@@ -287,7 +287,7 @@ export default function ProfessionalsPage() {
                    </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6 bg-[#2a1d35] p-6 rounded-[24px] border border-border-theme">
+                <div className="grid grid-cols-2 gap-6 bg-[#334155] p-6 rounded-[24px] border border-border-theme">
                   <Input 
                     label="Available Hours (Start)" 
                     type="time" 

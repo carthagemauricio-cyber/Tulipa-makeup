@@ -64,7 +64,7 @@ export default function ClientPanelPage() {
         <p className="text-text-muted text-lg max-w-lg mx-auto">Acompanhe o status do seu agendamento de forma rápida. Digite seu nome completo ou o código da reserva.</p>
       </div>
 
-      <AnimatedCard className="mb-12 p-1.5 bg-gradient-to-br from-[#2a1d35]/80 to-[#1c1524]/90 backdrop-blur-lg border border-[#3b2856] rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative z-10 group overflow-hidden">
+      <AnimatedCard className="mb-12 p-1.5 bg-gradient-to-br from-[#334155]/80 to-[#1e293b]/90 backdrop-blur-lg border border-[#475569] rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative z-10 group overflow-hidden">
         {/* Subtle hover glow on the card */}
         <div className="absolute inset-0 bg-gradient-to-r from-accent-pink/0 via-accent-pink/5 to-accent-pink/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
         
@@ -77,7 +77,7 @@ export default function ClientPanelPage() {
                 setSearchTerm(e.target.value);
                 setHasSearched(false);
               }}
-              className="w-full bg-[#1c1524]/50 border-transparent hover:border-accent-pink/30 focus:border-accent-pink focus:bg-[#2a1d35] h-[60px] text-white text-base rounded-[16px] pl-12"
+              className="w-full bg-[#1e293b]/50 border-transparent hover:border-accent-pink/30 focus:border-accent-pink focus:bg-[#334155] h-[60px] text-white text-base rounded-[16px] pl-12"
             />
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted peer-focus:text-accent-pink transition-colors" />
           </div>
@@ -104,8 +104,8 @@ export default function ClientPanelPage() {
             </h2>
             
             {filteredAppointments.length === 0 ? (
-              <AnimatedCard className="bg-[#1c1524]/60 backdrop-blur-md border border-[#3b2856] rounded-[24px] p-12 text-center shadow-lg">
-                <div className="w-20 h-20 mx-auto bg-[#2a1d35] rounded-full flex items-center justify-center mb-6 shadow-inner">
+              <AnimatedCard className="bg-[#1e293b]/60 backdrop-blur-md border border-[#475569] rounded-[24px] p-12 text-center shadow-lg">
+                <div className="w-20 h-20 mx-auto bg-[#334155] rounded-full flex items-center justify-center mb-6 shadow-inner">
                   <Search className="w-8 h-8 text-text-muted opacity-50" />
                 </div>
                 <p className="text-xl text-white font-serif mb-2">Nenhum agendamento encontrado.</p>
@@ -117,7 +117,7 @@ export default function ClientPanelPage() {
                 const paramDate = parseISO(appt.date);
                 
                 return (
-                  <AnimatedCard key={appt.id} delay={i * 0.1} className="bg-gradient-to-br from-[#2a1d35]/60 to-[#1c1524]/80 backdrop-blur-md border border-[#3b2856] hover:border-accent-pink/40 shadow-[0_8px_30px_rgba(0,0,0,0.2)] rounded-[24px] overflow-hidden transition-all duration-300 group">
+                  <AnimatedCard key={appt.id} delay={i * 0.1} className="bg-gradient-to-br from-[#334155]/60 to-[#1e293b]/80 backdrop-blur-md border border-[#475569] hover:border-accent-pink/40 shadow-[0_8px_30px_rgba(0,0,0,0.2)] rounded-[24px] overflow-hidden transition-all duration-300 group">
                     <div className="p-6 sm:p-8">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-8">
                         <div>
@@ -133,18 +133,18 @@ export default function ClientPanelPage() {
                       </div>
                       
                       <div className="grid sm:grid-cols-2 gap-4">
-                        <div className="flex items-center gap-4 bg-[#1c1524]/50 rounded-[16px] p-4 border border-[#3b2856]/50">
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#3b2856] to-[#2a1d35] flex items-center justify-center shrink-0 border border-[#3b2856] shadow-inner">
+                        <div className="flex items-center gap-4 bg-[#1e293b]/50 rounded-[16px] p-4 border border-[#475569]/50">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#475569] to-[#334155] flex items-center justify-center shrink-0 border border-[#475569] shadow-inner">
                             <Scissors className="w-5 h-5 text-accent-pink" />
                           </div>
                           <div>
                             <p className="text-[10px] text-text-muted uppercase tracking-widest font-bold mb-1">Serviço Agendado</p>
-                            <p className="font-medium text-white text-lg">{service?.name || 'Serviço Removido'}</p>
+                            <p className="font-medium text-white text-lg">{service?.name || 'Serviço Removido / Sem Nome'}</p>
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-4 bg-[#1c1524]/50 rounded-[16px] p-4 border border-[#3b2856]/50">
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#3b2856] to-[#2a1d35] flex items-center justify-center shrink-0 border border-[#3b2856] shadow-inner">
+                        <div className="flex items-center gap-4 bg-[#1e293b]/50 rounded-[16px] p-4 border border-[#475569]/50">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#475569] to-[#334155] flex items-center justify-center shrink-0 border border-[#475569] shadow-inner">
                             <Calendar className="w-5 h-5 text-accent-pink" />
                           </div>
                           <div>
@@ -176,9 +176,9 @@ export default function ClientPanelPage() {
             
             <div className="grid sm:grid-cols-2 gap-4">
               {services.map((service, i) => (
-                <AnimatedCard key={service.id} delay={i * 0.1} className="bg-gradient-to-br from-[#2a1d35]/60 to-[#1c1524]/80 backdrop-blur-md border border-[#3b2856] hover:border-accent-pink/40 shadow-[0_8px_30px_rgba(0,0,0,0.2)] rounded-[24px] p-6 group transition-all duration-300">
+                <AnimatedCard key={service.id} delay={i * 0.1} className="bg-gradient-to-br from-[#334155]/60 to-[#1e293b]/80 backdrop-blur-md border border-[#475569] hover:border-accent-pink/40 shadow-[0_8px_30px_rgba(0,0,0,0.2)] rounded-[24px] p-6 group transition-all duration-300">
                   <div className="flex items-center gap-4">
-                     <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#3b2856] to-[#2a1d35] flex items-center justify-center shrink-0 border border-[#3b2856] shadow-inner group-hover:border-accent-pink/30 transition-colors">
+                     <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#475569] to-[#334155] flex items-center justify-center shrink-0 border border-[#475569] shadow-inner group-hover:border-accent-pink/30 transition-colors">
                         <Scissors className="w-6 h-6 text-accent-pink group-hover:scale-110 transition-transform duration-300" />
                      </div>
                      <div className="flex-1">

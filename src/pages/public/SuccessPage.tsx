@@ -27,7 +27,7 @@ export default function SuccessPage() {
         </p>
 
         {code && (
-          <div className="bg-[#2a1d35] border border-border-theme rounded-2xl p-6 mb-8 max-w-sm mx-auto">
+          <div className="bg-[#334155] border border-border-theme rounded-2xl p-6 mb-8 max-w-sm mx-auto">
             <p className="text-[12px] uppercase tracking-wider font-semibold text-text-muted mb-2">Seu Código de Acompanhamento</p>
             <div className="flex items-center justify-center gap-3">
               <span className="text-3xl font-mono font-bold text-accent-pink tracking-widest">{code}</span>

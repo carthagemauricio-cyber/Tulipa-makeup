@@ -55,13 +55,13 @@ export default function BookingsPage() {
         </div>
       </div>
 
-      <Card className="bg-[#1c1524] p-4 flex flex-col md:flex-row gap-4 mb-6">
+      <Card className="bg-[#1e293b] p-4 flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex-1">
           <Input
             placeholder="Buscar por Nome, Data ou Serviço..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-[#2a1d35] text-white border-border-theme h-11"
+            className="bg-[#334155] text-white border-border-theme h-11"
           />
         </div>
         <div className="w-full md:w-48 text-white">
@@ -75,14 +75,14 @@ export default function BookingsPage() {
               { value: 'completed', label: '✔️ Concluídos' },
               { value: 'cancelled', label: '❌ Cancelados' },
             ]}
-            className="bg-[#2a1d35] text-white h-11 border-border-theme"
+            className="bg-[#334155] text-white h-11 border-border-theme"
           />
         </div>
       </Card>
 
       <div className="grid gap-4">
         {filteredAppointments.length === 0 ? (
-          <div className="p-12 text-center bg-[#1c1524] border border-border-theme rounded-3xl">
+          <div className="p-12 text-center bg-[#1e293b] border border-border-theme rounded-3xl">
             <Filter className="w-12 h-12 text-text-muted mx-auto mb-4 opacity-30" />
             <h3 className="text-lg font-bold text-white mb-2">Nenhuma reserva encontrada</h3>
             <p className="text-text-muted text-sm">Tente ajustar os filtros ou termo de busca.</p>
@@ -102,7 +102,7 @@ export default function BookingsPage() {
                   exit={{ opacity: 0, height: 0, marginBottom: 0, overflow: 'hidden' }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card className="bg-[#1c1524] p-0 overflow-hidden">
+                  <Card className="bg-[#1e293b] p-0 overflow-hidden">
                     <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-6">
                       <div className="flex-1 flex flex-col md:flex-row gap-6">
                         {/* ID e Cliente */}
@@ -121,13 +121,13 @@ export default function BookingsPage() {
                         {/* Detalhes do Serviço */}
                         <div className="w-full md:w-1/3 space-y-2 border-l-0 md:border-l border-t md:border-t-0 border-border-theme pt-4 md:pt-0 md:pl-6">
                           <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 rounded bg-[#2a1d35] flex items-center justify-center shrink-0">
+                            <span className="w-6 h-6 rounded bg-[#334155] flex items-center justify-center shrink-0">
                               ✂️
                             </span>
                             <span className="text-sm font-medium text-white">{service?.name || "Removido"}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 rounded bg-[#2a1d35] flex items-center justify-center shrink-0">
+                            <span className="w-6 h-6 rounded bg-[#334155] flex items-center justify-center shrink-0">
                               👩
                             </span>
                             <span className="text-sm text-text-muted">{prof?.name || "Removido"}</span>
