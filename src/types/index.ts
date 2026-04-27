@@ -2,6 +2,8 @@ export interface Professional {
   id: string;
   name: string;
   photoUrl: string;
+  phone?: string;
+  email?: string;
   specialties: string[];
   availability: {
     days: number[]; // 0-6 (Sun-Sat)

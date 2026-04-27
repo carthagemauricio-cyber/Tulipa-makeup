@@ -15,10 +15,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const variants = {
       primary: "bg-accent-pink text-white hover:opacity-90 shadow-[0_4px_15px_rgba(217,70,239,0.3)] focus:ring-accent-pink",
-      secondary: "bg-pastel-pink text-deep-purple hover:bg-border-theme focus:ring-accent-pink",
-      outline: "border-2 border-border-theme text-deep-purple hover:bg-soft-lilac focus:ring-accent-pink",
-      ghost: "text-text-main hover:bg-soft-lilac hover:text-deep-purple focus:ring-accent-pink",
-      danger: "bg-red-50 text-red-600 hover:bg-red-100 focus:ring-red-400",
+      secondary: "bg-[#2a1d35] text-white hover:bg-[#3b2856] focus:ring-accent-pink",
+      outline: "border-2 border-border-theme text-text-main hover:bg-[#2a1d35] focus:ring-accent-pink",
+      ghost: "text-text-main hover:bg-[#2a1d35] hover:text-white focus:ring-accent-pink",
+      danger: "bg-[rgba(239,68,68,0.1)] text-red-500 hover:bg-[rgba(239,68,68,0.2)] focus:ring-red-400",
     };
 
     const sizes = {

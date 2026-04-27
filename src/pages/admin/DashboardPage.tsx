@@ -61,16 +61,16 @@ export default function DashboardPage() {
                     return (
                       <div key={appt.id} className={cn(
                         "flex items-center p-3 rounded-[16px]",
-                        i % 2 === 0 ? "bg-soft-lilac border-l-4 border-l-accent-pink" : "bg-white border border-border-theme"
+                        i % 2 === 0 ? "bg-[#2a1d35] border-l-4 border-l-accent-pink" : "bg-[#1c1524] border border-border-theme"
                       )}>
-                        <div className="w-[70px] font-bold text-[14px] text-deep-purple">
+                        <div className="w-[70px] font-bold text-[14px] text-accent-pink">
                           {appt.time}
                         </div>
                         <div className="flex-1">
-                          <div className="font-semibold text-[15px]">{appt.clientName}</div>
+                          <div className="font-semibold text-white text-[15px]">{appt.clientName}</div>
                           <div className="text-[12px] text-text-muted">{service?.name}</div>
                         </div>
-                        <div className="text-[12px] italic text-accent-pink">
+                        <div className="text-[12px] italic text-deep-purple">
                           {prof?.name}
                         </div>
                       </div>
@@ -85,10 +85,10 @@ export default function DashboardPage() {
         <div className="w-full lg:w-[340px] space-y-8">
           <div>
             <div className="font-serif italic text-[20px] mb-5 text-deep-purple">Nossas Especialistas</div>
-            <Card className="bg-white">
+            <Card className="bg-[#1c1524]">
                <div className="grid grid-cols-2 gap-4">
                  {professionals.map(p => (
-                   <div key={p.id} className="flex items-center gap-2.5 p-2 bg-pastel-pink rounded-[50px] text-[13px] text-text-main">
+                   <div key={p.id} className="flex items-center gap-2.5 p-2 bg-[#2a1d35] rounded-[50px] text-[13px] text-white">
                      <div className="w-8 h-8 rounded-full bg-accent-pink flex items-center justify-center text-white font-bold text-[12px] overflow-hidden shrink-0">
                        <img src={p.photoUrl} alt={p.name} className="w-full h-full object-cover" />
                      </div>

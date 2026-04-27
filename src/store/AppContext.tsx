@@ -31,6 +31,8 @@ const defaultProfessionals: Professional[] = [
     id: 'p1',
     name: 'Ana Souza',
     photoUrl: 'https://picsum.photos/seed/ana/200/200',
+    phone: '+258 84 123 4567',
+    email: 'ana.souza@tulipahair.com',
     specialties: ['s1', 's2'],
     availability: { days: [1, 2, 3, 4, 5], startHour: '09:00', endHour: '18:00' }
   },
@@ -38,6 +40,8 @@ const defaultProfessionals: Professional[] = [
     id: 'p2',
     name: 'Júlia Mendes',
     photoUrl: 'https://picsum.photos/seed/julia/200/200',
+    phone: '+258 84 987 6543',
+    email: 'julia.mendes@tulipahair.com',
     specialties: ['s3', 's4', 's1'],
     availability: { days: [2, 3, 4, 5, 6], startHour: '10:00', endHour: '19:00' }
   }
@@ -50,7 +54,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const saved = localStorage.getItem('tulipaData');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Ensure legacy professionals have new fields
+        parsed.professionals = parsed.professionals?.map((p: Professional) => ({
+          ...p,
+          phone: p.phone || '',
+          email: p.email || '',
+        })) || [];
+        return parsed;
       } catch (e) {
         console.error("Failed to parse local storage", e);
       }

@@ -8,11 +8,15 @@
   --color-soft-lilac: #f3e8ff;
   --color-pastel-pink: #fce7f3;
   --color-accent-pink: #d946ef;
-  --color-deep-purple: #701a75;
+  --color-deep-purple: #fbcfe8;
   --color-white: #ffffff;
-  --color-text-main: #4a044e;
-  --color-text-muted: #86198f;
-  --color-border-theme: #f5d0fe;
+  --color-text-main: #fce7f3;
+  --color-text-muted: #e879f9;
+  --color-border-theme: #4a044e;
+
+  /* Dark theme overrides */
+  --color-bg-base: #110e15;
+  --color-bg-card: #1c1524;
 }
 
 @layer utilities {
@@ -25,21 +29,22 @@
   }
 
   .bg-sidebar-grad {
-    background: linear-gradient(180deg, var(--color-soft-lilac) 0%, var(--color-pastel-pink) 100%);
+    background: linear-gradient(180deg, #20132b 0%, #150a1c 100%);
   }
 
   .bg-main-grad {
-    background: var(--color-white) radial-gradient(circle at top right, var(--color-pastel-pink) 0%, transparent 40%),
-                radial-gradient(circle at bottom left, var(--color-soft-lilac) 0%, transparent 40%);
+    background: var(--color-bg-base) radial-gradient(circle at top right, rgba(217, 70, 239, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at bottom left, rgba(112, 26, 117, 0.1) 0%, transparent 40%);
   }
 }
 
 @layer base {
   body {
-    background-color: var(--color-white);
+    background-color: var(--color-bg-base);
     color: var(--color-text-main);
     font-family: var(--font-sans);
   }
+
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif);
