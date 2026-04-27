@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, Link } from 'react-router-dom';
-import { Flower2, LayoutDashboard, Users, Scissors, CalendarDays, Menu, X, ArrowLeft } from 'lucide-react';
+import { Flower2, LayoutDashboard, Users, Scissors, CalendarDays, Menu, X, ArrowLeft, BookOpenCheck } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { AnimatePresence, motion } from 'motion/react';
 
 const navItems = [
   { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
+  { path: '/admin/bookings', icon: BookOpenCheck, label: 'Reservas' },
   { path: '/admin/calendar', icon: CalendarDays, label: 'Calendário' },
   { path: '/admin/professionals', icon: Users, label: 'Profissionais' },
   { path: '/admin/services', icon: Scissors, label: 'Serviços' },

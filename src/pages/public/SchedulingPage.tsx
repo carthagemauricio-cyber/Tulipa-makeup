@@ -61,7 +61,7 @@ export default function SchedulingPage() {
       setStep(step + 1);
     } else {
       // Submit
-      addAppointment({
+      const newAppt = addAppointment({
         clientName,
         clientPhone,
         serviceId: selectedServiceId,
@@ -69,7 +69,7 @@ export default function SchedulingPage() {
         date: format(selectedDate!, 'yyyy-MM-dd'),
         time: selectedTime,
       });
-      navigate('/success');
+      navigate(`/success?code=${newAppt.bookingCode}`);
     }
   };
 

@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Professional, Service, Appointment } from '../types';
+import { Professional, Service, Appointment, AppointmentStatus } from '../types';
 import { generateId } from '../lib/utils';
+
+// Helper to generate a short booking code
+const generateBookingCode = () => {
+  return 'MZ-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+};
 
 interface AppState {
   professionals: Professional[];
@@ -15,8 +20,9 @@ interface AppContextType extends AppState {
   addService: (s: Omit<Service, 'id'>) => void;
   updateService: (id: string, s: Partial<Service>) => void;
   removeService: (id: string) => void;
-  addAppointment: (a: Omit<Appointment, 'id' | 'status'>) => void;
-  cancelAppointment: (id: string) => void;
+  addAppointment: (a: Omit<Appointment, 'id' | 'status' | 'bookingCode'>) => Appointment;
+  updateAppointmentStatus: (id: string, status: AppointmentStatus) => void;
+  deleteAppointment: (id: string) => void;
 }
 
 const defaultServices: Service[] = [
@@ -61,6 +67,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           phone: p.phone || '',
           email: p.email || '',
         })) || [];
+        
+        // Ensure legacy appointments have new fields
+        parsed.appointments = parsed.appointments?.map((a: any) => ({
+          ...a,
+          bookingCode: a.bookingCode || generateBookingCode(),
+          status: a.status === 'confirmed' || a.status === 'cancelled' ? a.status : 'pending',
+        })) || [];
+        
         return parsed;
       } catch (e) {
         console.error("Failed to parse local storage", e);
@@ -76,6 +90,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem('tulipaData', JSON.stringify(data));
   }, [data]);
+
+  // Sync state across tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'tulipaData' && e.newValue) {
+        try {
+          setData(JSON.parse(e.newValue));
+        } catch (err) {
+          console.error("Failed to parse cross-tab storage", err);
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const addProfessional = (p: Omit<Professional, 'id'>) => {
     setData(prev => ({ ...prev, professionals: [...prev.professionals, { ...p, id: generateId() }] }));
@@ -107,17 +136,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setData(prev => ({ ...prev, services: prev.services.filter(s => s.id !== id) }));
   };
 
-  const addAppointment = (a: Omit<Appointment, 'id' | 'status'>) => {
+  const addAppointment = (a: Omit<Appointment, 'id' | 'status' | 'bookingCode'>) => {
+    const newAppointment: Appointment = {
+      ...a,
+      id: generateId(),
+      bookingCode: generateBookingCode(),
+      status: 'pending' // Default status is now pending
+    };
+    
     setData(prev => ({
       ...prev,
-      appointments: [...prev.appointments, { ...a, id: generateId(), status: 'confirmed' }]
+      appointments: [...prev.appointments, newAppointment]
+    }));
+    
+    return newAppointment;
+  };
+
+  const updateAppointmentStatus = (id: string, status: AppointmentStatus) => {
+    setData(prev => ({
+      ...prev,
+      appointments: prev.appointments.map(a => a.id === id ? { ...a, status } : a)
     }));
   };
 
-  const cancelAppointment = (id: string) => {
+  const deleteAppointment = (id: string) => {
     setData(prev => ({
       ...prev,
-      appointments: prev.appointments.map(a => a.id === id ? { ...a, status: 'cancelled' } : a)
+      appointments: prev.appointments.filter(a => a.id !== id)
     }));
   };
 
@@ -126,7 +171,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ...data,
       addProfessional, updateProfessional, removeProfessional,
       addService, updateService, removeService,
-      addAppointment, cancelAppointment
+      addAppointment, updateAppointmentStatus, deleteAppointment
     }}>
       {children}
     </AppContext.Provider>

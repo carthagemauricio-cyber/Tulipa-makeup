@@ -20,13 +20,16 @@ export interface Service {
   icon?: string;
 }
 
+export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
+
 export interface Appointment {
   id: string;
+  bookingCode: string; // New: Unique code for tracking
   clientName: string;
   clientPhone: string;
   serviceId: string;
   professionalId: string;
   date: string; // "YYYY-MM-DD"
   time: string; // "HH:mm"
-  status: 'confirmed' | 'cancelled';
+  status: AppointmentStatus;
 }
