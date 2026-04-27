@@ -11,14 +11,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', fullWidth, children, ...props }, ref) => {
     
-    const baseStyles = "inline-flex items-center justify-center font-bold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+    const baseStyles = "inline-flex items-center justify-center font-bold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden";
     
     const variants = {
-      primary: "bg-accent-pink text-white hover:opacity-90 shadow-[0_4px_15px_rgba(217,70,239,0.3)] focus:ring-accent-pink",
-      secondary: "bg-[#2a1d35] text-white hover:bg-[#3b2856] focus:ring-accent-pink",
-      outline: "border-2 border-border-theme text-text-main hover:bg-[#2a1d35] focus:ring-accent-pink",
+      primary: "bg-accent-pink text-white hover:opacity-90 shadow-[0_4px_15px_rgba(217,70,239,0.4)] hover:shadow-[0_6px_20px_rgba(217,70,239,0.6)] focus:ring-accent-pink",
+      secondary: "bg-[#2a1d35] text-white hover:bg-[#3b2856] focus:ring-accent-pink hover:shadow-lg",
+      outline: "border-2 border-border-theme text-text-main hover:bg-[#2a1d35] hover:border-accent-pink/50 focus:ring-accent-pink",
       ghost: "text-text-main hover:bg-[#2a1d35] hover:text-white focus:ring-accent-pink",
-      danger: "bg-[rgba(239,68,68,0.1)] text-red-500 hover:bg-[rgba(239,68,68,0.2)] focus:ring-red-400",
+      danger: "bg-[rgba(239,68,68,0.1)] text-red-500 hover:bg-[rgba(239,68,68,0.2)] focus:ring-red-400 hover:shadow-lg",
     };
 
     const sizes = {

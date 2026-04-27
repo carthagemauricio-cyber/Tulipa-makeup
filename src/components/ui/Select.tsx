@@ -22,10 +22,10 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           <select
             ref={ref}
             className={cn(
-              "flex w-full appearance-none rounded-xl border border-border-theme bg-[#2a1d35] px-[18px] py-[14px] pr-10 text-sm focus:outline-none focus:border-accent-pink disabled:cursor-not-allowed disabled:opacity-50 transition-all",
+              "flex w-full appearance-none rounded-xl border border-border-theme bg-[#2a1d35] px-[18px] py-[14px] pr-10 text-sm transition-all duration-300 hover:border-accent-pink/50 focus:outline-none focus:border-accent-pink focus:bg-[#342442] focus:ring-[3px] focus:ring-accent-pink/20 focus:shadow-[0_0_15px_rgba(217,70,239,0.2)] focus:-translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-50",
               !props.value && "text-text-muted/60",
               props.value && "text-white",
-              error && "border-red-300 focus:border-red-400",
+              error && "border-red-300 focus:border-red-400 focus:ring-red-400/20 focus:shadow-none",
               className
             )}
             {...props}
