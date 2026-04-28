@@ -1,121 +1,71 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAppStore } from '../../store/AppContext';
-import { Card, AnimatedCard } from '../../components/ui/Card';
+import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Trash2, Edit2 } from 'lucide-react';
+import { Scissors, Trash2, Edit } from 'lucide-react';
 import { Service } from '../../types';
 
 export default function ServicesPage() {
-  const { services, addService, updateService, removeService } = useAppStore();
-  const [isEditing, setIsEditing] = useState<string | null>(null);
-  
-  const [formData, setFormData] = useState<Omit<Service, 'id'>>({
-    name: '',
-    durationMinutes: 60,
-    price: 1000,
-    icon: 'scissors'
-  });
-  const [errorMsg, setErrorMsg] = useState('');
+  const { services, addService, updateService, deleteService } = useAppStore();
+  const [formData, setFormData] = useState<Partial<Service>>({ name: '', durationMinutes: 60, price: 1000, description: '' });
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const handleSave = () => {
-    if (!formData.name || formData.name.trim() === '') {
-      setErrorMsg('O nome do serviço é obrigatório.');
-      return;
-    }
-    setErrorMsg('');
-    
-    if (isEditing) {
-      updateService(isEditing, formData);
-      setIsEditing(null);
+    if (!formData.name) return;
+    if (editingId) {
+      updateService(editingId, formData);
+      setEditingId(null);
     } else {
-      addService(formData);
+      addService(formData as any);
     }
-    
-    setFormData({ name: '', durationMinutes: 60, price: 1000, icon: 'scissors', description: '', image: '' });
+    setFormData({ name: '', durationMinutes: 60, price: 1000, description: '' });
   };
 
   const handleEdit = (s: Service) => {
+    setEditingId(s.id);
     setFormData(s);
-    setIsEditing(s.id);
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-serif font-medium text-white">Serviços</h1>
-        <p className="text-text-muted mt-1">Gerencie os serviços oferecidos.</p>
-      </div>
-
+      <h1 className="text-3xl font-serif font-bold text-white mb-6">Serviços</h1>
       <div className="grid md:grid-cols-3 gap-6">
-        <Card className="md:col-span-1 h-fit bg-[#1e293b] border-[#475569]">
-          <h2 className="text-lg font-medium mb-4 text-white">{isEditing ? 'Editar Serviço' : 'Adicionar Serviço'}</h2>
-          <div className="space-y-4 text-text-main">
-            <Input 
-              label="Nome do Serviço" 
-              value={formData.name || ''} 
-              error={errorMsg}
-              onChange={e => {
-                setFormData({...formData, name: e.target.value});
-                if (errorMsg) setErrorMsg('');
-              }} 
-            />
-            <Input 
-              label="Duração (Minutos)" 
-              type="number"
-              value={formData.durationMinutes || ''} 
-              onChange={e => setFormData({...formData, durationMinutes: parseInt(e.target.value) || 0})} 
-            />
-            <Input 
-              label="Preço (MZN)" 
-              type="number"
-              value={formData.price || ''} 
-              onChange={e => setFormData({...formData, price: parseInt(e.target.value) || 0})} 
-            />
-            <Input 
-              label="Descrição (Opcional)" 
-              value={formData.description || ''} 
-              onChange={e => setFormData({...formData, description: e.target.value})} 
-            />
-            <Input 
-              label="URL da Imagem (Opcional)" 
-              value={formData.image || ''} 
-              onChange={e => setFormData({...formData, image: e.target.value})} 
-            />
-
-            <Button fullWidth onClick={handleSave} className="mt-4">
-              {isEditing ? 'Salvar Alterações' : 'Adicionar'}
-            </Button>
-            {isEditing && (
-              <Button fullWidth variant="ghost" onClick={() => {
-                setIsEditing(null);
-                setFormData({ name: '', durationMinutes: 60, price: 1000, icon: 'scissors', description: '', image: '' });
-                setErrorMsg('');
-              }}>
-                Cancelar
-              </Button>
-            )}
+        <Card className="md:col-span-1 h-fit">
+          <h2 className="text-xl font-serif font-bold text-white mb-4">{editingId ? 'Editar Serviço' : 'Novo Serviço'}</h2>
+          <div className="space-y-4">
+            <Input label="Nome" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} />
+            <Input type="number" label="Duração (min)" value={formData.durationMinutes || ''} onChange={e => setFormData({...formData, durationMinutes: parseInt(e.target.value) || 0})} />
+            <Input type="number" label="Preço (MZN)" value={formData.price || ''} onChange={e => setFormData({...formData, price: parseInt(e.target.value) || 0})} />
+            <Input label="Descrição" value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} />
+            <div className="flex gap-2">
+              <Button onClick={handleSave} fullWidth>{editingId ? 'Salvar' : 'Adicionar'}</Button>
+              {editingId && <Button variant="ghost" onClick={() => { setEditingId(null); setFormData({ name: '', durationMinutes: 60, price: 1000, description: '' }); }}>Cancelar</Button>}
+            </div>
           </div>
         </Card>
-
         <div className="md:col-span-2 space-y-4">
-          {services.map((s, i) => (
-            <AnimatedCard key={s.id} delay={i * 0.1} className="flex flex-col sm:flex-row gap-4 justify-between p-4 bg-[#1e293b] border border-[#475569]">
-              <div>
-                <h3 className="font-medium text-white text-lg">{s.name || 'Unnamed Service'}</h3>
-                <p className="text-sm text-text-muted">
-                  {s.durationMinutes} minutos • {(s.price).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
-                </p>
+          {services.map(s => (
+            <Card key={s.id} className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#2a1d35] rounded-full flex items-center justify-center text-accent-pink">
+                  <Scissors className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-white">{s.name}</h3>
+                  <p className="text-sm text-text-muted">{s.durationMinutes} min • {s.price} MZN</p>
+                  {s.description && <p className="text-xs text-text-muted mt-1">{s.description}</p>}
+                </div>
               </div>
-              <div className="flex items-center gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 pb-1">
-                <Button size="sm" variant="outline" onClick={() => handleEdit(s)}>
-                  <Edit2 className="w-4 h-4 mr-1" /> Editar
+              <div className="flex gap-2">
+                <Button variant="ghost" onClick={() => handleEdit(s)}>
+                  <Edit className="w-4 h-4" />
                 </Button>
-                <Button size="sm" variant="danger" onClick={() => removeService(s.id)}>
-                  <Trash2 className="w-4 h-4 mr-1" /> Remover
+                <Button variant="danger" onClick={() => deleteService(s.id)}>
+                  <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
-            </AnimatedCard>
+            </Card>
           ))}
         </div>
       </div>

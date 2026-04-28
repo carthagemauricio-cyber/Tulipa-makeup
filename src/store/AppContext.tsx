@@ -1,193 +1,83 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Professional, Service, Appointment, AppointmentStatus } from '../types';
-import { generateId } from '../lib/utils';
+import { Appointment, Professional, Service } from '../types';
 
-// Helper to generate a short booking code
-const generateBookingCode = () => {
-  return 'MZ-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-};
-
-interface AppState {
-  professionals: Professional[];
+interface AppContextType {
   services: Service[];
+  professionals: Professional[];
   appointments: Appointment[];
-}
-
-interface AppContextType extends AppState {
-  addProfessional: (p: Omit<Professional, 'id'>) => void;
-  updateProfessional: (id: string, p: Partial<Professional>) => void;
-  removeProfessional: (id: string) => void;
   addService: (s: Omit<Service, 'id'>) => void;
   updateService: (id: string, s: Partial<Service>) => void;
-  removeService: (id: string) => void;
-  addAppointment: (a: Omit<Appointment, 'id' | 'status' | 'bookingCode'>) => Appointment;
-  updateAppointmentStatus: (id: string, status: AppointmentStatus) => void;
-  deleteAppointment: (id: string) => void;
+  deleteService: (id: string) => void;
+  addProfessional: (p: Omit<Professional, 'id'>) => void;
+  updateProfessional: (id: string, p: Partial<Professional>) => void;
+  deleteProfessional: (id: string) => void;
+  addAppointment: (a: Omit<Appointment, 'id' | 'bookingCode'>) => Appointment;
+  updateAppointmentStatus: (id: string, status: Appointment['status']) => void;
 }
-
-const defaultServices: Service[] = [
-  { id: 's1', name: 'Corte', durationMinutes: 60, price: 1500, icon: 'scissors' },
-  { id: 's2', name: 'Tintura', durationMinutes: 120, price: 3500, icon: 'palette' },
-  { id: 's3', name: 'Progressiva', durationMinutes: 180, price: 4500, icon: 'sparkles' },
-  { id: 's4', name: 'Selagem', durationMinutes: 120, price: 4000, icon: 'shield' },
-];
-
-const defaultProfessionals: Professional[] = [
-  {
-    id: 'p1',
-    name: 'Ana Souza',
-    photoUrl: 'https://picsum.photos/seed/ana/200/200',
-    phone: '+258 84 123 4567',
-    email: 'ana.souza@tulipahair.com',
-    specialties: ['s1', 's2'],
-    availability: { days: [1, 2, 3, 4, 5], startHour: '09:00', endHour: '18:00' }
-  },
-  {
-    id: 'p2',
-    name: 'Júlia Mendes',
-    photoUrl: 'https://picsum.photos/seed/julia/200/200',
-    phone: '+258 84 987 6543',
-    email: 'julia.mendes@tulipahair.com',
-    specialties: ['s3', 's4', 's1'],
-    availability: { days: [2, 3, 4, 5, 6], startHour: '10:00', endHour: '19:00' }
-  }
-];
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const defaultServices: Service[] = [
+  { id: '1', name: 'Corte Clássico', durationMinutes: 45, price: 1500, description: 'Corte de cabelo simples' },
+  { id: '2', name: 'Coloração', durationMinutes: 120, price: 4000, description: 'Tingimento completo' },
+  { id: '3', name: 'Tratamento Capilar', durationMinutes: 60, price: 2500, description: 'Hidratação profunda' }
+];
+
+const defaultProfessionals: Professional[] = [
+  { id: '1', name: 'Ana Silva', photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop', serviceIds: ['1', '2'], schedule: [1,2,3,4,5,6].map(d => ({dayOfWeek: d, isAvailable: true})) },
+  { id: '2', name: 'Carlos Santos', photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop', serviceIds: ['1', '3'], schedule: [1,2,3,4,5].map(d => ({dayOfWeek: d, isAvailable: true})) }
+];
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [data, setData] = useState<AppState>(() => {
-    const saved = localStorage.getItem('tulipaData');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Ensure legacy professionals have new fields
-        parsed.professionals = parsed.professionals?.map((p: Professional) => ({
-          ...p,
-          phone: p.phone || '',
-          email: p.email || '',
-        })) || [];
-        
-        // Ensure legacy appointments have new fields
-        parsed.appointments = parsed.appointments?.map((a: any) => ({
-          ...a,
-          bookingCode: a.bookingCode || generateBookingCode(),
-          status: a.status === 'confirmed' || a.status === 'cancelled' ? a.status : 'pending',
-        })) || [];
-
-        // Ensure services are always correctly mapped and formatted
-        parsed.services = parsed.services?.map((s: any) => ({
-          ...s,
-          name: s.name || '',
-          durationMinutes: s.durationMinutes || 60,
-          price: s.price || 0,
-        })) || defaultServices;
-        
-        return parsed;
-      } catch (e) {
-        console.error("Failed to parse local storage", e);
-      }
-    }
-    return {
-      professionals: defaultProfessionals,
-      services: defaultServices,
-      appointments: []
-    };
-  });
+  const [services, setServices] = useState<Service[]>(defaultServices);
+  const [professionals, setProfessionals] = useState<Professional[]>(defaultProfessionals);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   useEffect(() => {
-    localStorage.setItem('tulipaData', JSON.stringify(data));
-  }, [data]);
-
-  // Sync state across tabs
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'tulipaData' && e.newValue) {
-        try {
-          setData(JSON.parse(e.newValue));
-        } catch (err) {
-          console.error("Failed to parse cross-tab storage", err);
-        }
+    try {
+      const stored = localStorage.getItem('tulipaAppData');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.services) setServices(parsed.services);
+        if (parsed.professionals) setProfessionals(parsed.professionals);
+        if (parsed.appointments) setAppointments(parsed.appointments);
       }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    } catch(e) {}
   }, []);
 
-  const addProfessional = (p: Omit<Professional, 'id'>) => {
-    setData(prev => ({ ...prev, professionals: [...prev.professionals, { ...p, id: generateId() }] }));
-  };
+  useEffect(() => {
+    localStorage.setItem('tulipaAppData', JSON.stringify({ services, professionals, appointments }));
+  }, [services, professionals, appointments]);
 
-  const updateProfessional = (id: string, p: Partial<Professional>) => {
-    setData(prev => ({
-      ...prev,
-      professionals: prev.professionals.map(prof => prof.id === id ? { ...prof, ...p } : prof)
-    }));
-  };
+  const addService = (s: Omit<Service, 'id'>) => setServices(prev => [...prev, { ...s, id: Math.random().toString(36).substring(7) }]);
+  const updateService = (id: string, s: Partial<Service>) => setServices(prev => prev.map(x => x.id === id ? { ...x, ...s } : x));
+  const deleteService = (id: string) => setServices(prev => prev.filter(x => x.id !== id));
 
-  const removeProfessional = (id: string) => {
-    setData(prev => ({ ...prev, professionals: prev.professionals.filter(p => p.id !== id) }));
-  };
+  const addProfessional = (p: Omit<Professional, 'id'>) => setProfessionals(prev => [...prev, { ...p, id: Math.random().toString(36).substring(7) }]);
+  const updateProfessional = (id: string, p: Partial<Professional>) => setProfessionals(prev => prev.map(x => x.id === id ? { ...x, ...p } : x));
+  const deleteProfessional = (id: string) => setProfessionals(prev => prev.filter(x => x.id !== id));
 
-  const addService = (s: Omit<Service, 'id'>) => {
-    setData(prev => ({ ...prev, services: [...prev.services, { ...s, id: generateId() }] }));
-  };
-
-  const updateService = (id: string, s: Partial<Service>) => {
-    setData(prev => ({
-      ...prev,
-      services: prev.services.map(srv => srv.id === id ? { ...srv, ...s } : srv)
-    }));
-  };
-
-  const removeService = (id: string) => {
-    setData(prev => ({ ...prev, services: prev.services.filter(s => s.id !== id) }));
-  };
-
-  const addAppointment = (a: Omit<Appointment, 'id' | 'status' | 'bookingCode'>) => {
-    const newAppointment: Appointment = {
+  const addAppointment = (a: Omit<Appointment, 'id' | 'bookingCode'>) => {
+    const newA: Appointment = {
       ...a,
-      id: generateId(),
-      bookingCode: generateBookingCode(),
-      status: 'pending' // Default status is now pending
+      id: Math.random().toString(36).substring(7),
+      bookingCode: Math.random().toString(36).substring(2, 8).toUpperCase()
     };
-    
-    setData(prev => ({
-      ...prev,
-      appointments: [...prev.appointments, newAppointment]
-    }));
-    
-    return newAppointment;
+    setAppointments(prev => [...prev, newA]);
+    return newA;
   };
-
-  const updateAppointmentStatus = (id: string, status: AppointmentStatus) => {
-    setData(prev => ({
-      ...prev,
-      appointments: prev.appointments.map(a => a.id === id ? { ...a, status } : a)
-    }));
-  };
-
-  const deleteAppointment = (id: string) => {
-    setData(prev => ({
-      ...prev,
-      appointments: prev.appointments.filter(a => a.id !== id)
-    }));
-  };
+  
+  const updateAppointmentStatus = (id: string, status: Appointment['status']) => setAppointments(prev => prev.map(x => x.id === id ? { ...x, status } : x));
 
   return (
-    <AppContext.Provider value={{
-      ...data,
-      addProfessional, updateProfessional, removeProfessional,
-      addService, updateService, removeService,
-      addAppointment, updateAppointmentStatus, deleteAppointment
-    }}>
+    <AppContext.Provider value={{ services, professionals, appointments, addService, updateService, deleteService, addProfessional, updateProfessional, deleteProfessional, addAppointment, updateAppointmentStatus }}>
       {children}
     </AppContext.Provider>
   );
 }
 
-export function useAppStore() {
+export const useAppStore = () => {
   const context = useContext(AppContext);
   if (!context) throw new Error('useAppStore must be used within AppProvider');
   return context;
-}
+};

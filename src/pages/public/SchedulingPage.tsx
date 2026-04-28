@@ -1,297 +1,147 @@
-import React, { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../../store/AppContext';
+import { Card, AnimatedCard } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Select } from '../../components/ui/Select';
-import { AnimatedCard } from '../../components/ui/Card';
-import { generateTimeSlots, filterAvailableTimeSlots } from '../../lib/scheduling';
-import { format, addDays, startOfToday, isSameDay } from 'date-fns';
-import { ptBR } from 'date-fns/locale'; // Using ptBR as closest to pt-MZ for date formatting
-import { motion, AnimatePresence } from 'motion/react';
-import { Calendar as CalendarIcon, Clock, User, Scissors, CheckCircle2 } from 'lucide-react';
+import { format, addDays, parseISO } from 'date-fns';
 
 export default function SchedulingPage() {
   const navigate = useNavigate();
-  const { services, professionals, appointments, addAppointment } = useAppStore();
-
+  const { services, professionals, addAppointment } = useAppStore();
   const [step, setStep] = useState(1);
-  const [selectedServiceId, setSelectedServiceId] = useState('');
-  const [selectedProfId, setSelectedProfId] = useState('');
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedService, setSelectedService] = useState('');
+  const [selectedProf, setSelectedProf] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
-  const [clientName, setClientName] = useState('');
-  const [clientPhone, setClientPhone] = useState('');
-  const [error, setError] = useState('');
+  const [clientData, setClientData] = useState({ name: '', phone: '' });
 
-  const selectedService = services.find(s => s.id === selectedServiceId);
-  const selectedProf = professionals.find(p => p.id === selectedProfId);
+  const dates = Array.from({length: 7}).map((_, i) => addDays(new Date(), i));
+  const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
 
-  // Available professionals for the selected service
-  const availableProfessionals = useMemo(() => {
-    if (!selectedServiceId) return [];
-    return professionals.filter(p => p.specialties.includes(selectedServiceId));
-  }, [professionals, selectedServiceId]);
+  const profsForService = professionals.filter(p => !selectedService || p.serviceIds.includes(selectedService));
 
-  // Generate 14 days from today
-  const upcomingDays = useMemo(() => {
-    const days = [];
-    const today = startOfToday();
-    for (let i = 0; i < 14; i++) {
-        days.push(addDays(today, i));
-    }
-    return days;
-  }, []);
-
-  // Generate and filter time slots
-  const availableSlots = useMemo(() => {
-    if (!selectedProf || !selectedService || !selectedDate) return [];
-    const allSlots = generateTimeSlots(selectedProf, selectedService, selectedDate, appointments);
-    return filterAvailableTimeSlots(allSlots, selectedDate, selectedService, selectedProf.id, appointments, services);
-  }, [selectedProf, selectedService, selectedDate, appointments, services]);
-
-  const handleNext = () => {
-    setError('');
-    if (step === 1 && !selectedServiceId) { setError('Por favor, selecione um serviço.'); return; }
-    if (step === 2 && !selectedProfId) { setError('Por favor, selecione uma profissional.'); return; }
-    if (step === 3 && (!selectedDate || !selectedTime)) { setError('Por favor, selecione a data e o horário.'); return; }
-    if (step === 4 && (!clientName || !clientPhone)) { setError('Por favor, preencha seus dados.'); return; }
-    
-    if (step < 4) {
-      setStep(step + 1);
-    } else {
-      // Submit
-      const newAppt = addAppointment({
-        clientName,
-        clientPhone,
-        serviceId: selectedServiceId,
-        professionalId: selectedProfId,
-        date: format(selectedDate!, 'yyyy-MM-dd'),
-        time: selectedTime,
-      });
-      navigate(`/success?code=${newAppt.bookingCode}`);
-    }
-  };
-
-  const handleBack = () => {
-    setError('');
-    setStep(step - 1);
+  const handleComplete = () => {
+    if (!selectedService || !selectedProf || !selectedDate || !selectedTime || !clientData.name || !clientData.phone) return;
+    const a = addAppointment({
+      serviceId: selectedService,
+      professionalId: selectedProf,
+      date: selectedDate,
+      time: selectedTime,
+      clientName: clientData.name,
+      clientPhone: clientData.phone,
+      status: 'pending'
+    });
+    navigate('/success', { state: { bookingCode: a.bookingCode } });
   };
 
   return (
-    <div className="max-w-xl mx-auto py-8">
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-serif font-medium text-lilac-600 mb-3">Agende seu horário</h1>
-        <p className="text-gray-500">Realce sua beleza no Tulipa Hair.</p>
+    <div className="max-w-4xl mx-auto py-12 px-4">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">Agende seu Horário</h1>
+        <p className="text-text-muted text-lg">Escolha o serviço e vamos cuidar da sua beleza.</p>
       </div>
 
-      {/* Progress Bar */}
-      <div className="flex gap-2 mb-8">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-1.5 flex-1 rounded-full bg-lilac-100 overflow-hidden">
-            <motion.div 
-              className="h-full bg-lilac-500"
-              initial={{ width: '0%' }}
-              animate={{ width: step >= i ? '100%' : '0%' }}
-              transition={{ duration: 0.3 }}
-            />
+      <div className="flex justify-between mb-8 relative">
+        <div className="absolute top-1/2 left-0 w-full h-1 bg-[#2a1d35] -translate-y-1/2 z-0" />
+        {[1, 2, 3, 4].map(s => (
+          <div key={s} className="relative z-10 flex flex-col items-center gap-2">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-colors ${step >= s ? 'bg-accent-pink text-white shadow-[0_0_15px_rgba(217,70,239,0.5)]' : 'bg-[#2a1d35] text-text-muted border-2 border-border-theme'}`}>
+              {s}
+            </div>
           </div>
         ))}
       </div>
 
-      <AnimatedCard className="overflow-hidden min-h-[400px] flex flex-col">
-        <AnimatePresence mode="wait">
-          
-          {/* Step 1: Service */}
-          {step === 1 && (
-            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex-1">
-              <h2 className="text-xl font-serif text-gray-800 mb-6 flex items-center gap-2">
-                <Scissors className="w-5 h-5 text-lilac-500" /> Qual serviço você deseja?
-              </h2>
-              <div className="grid gap-3">
-                {services.map(service => (
-                  <button
-                    key={service.id}
-                    onClick={() => {
-                      setSelectedServiceId(service.id);
-                      setSelectedProfId('');
-                      setSelectedDate(null);
-                      setSelectedTime('');
-                    }}
-                    className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${
-                      selectedServiceId === service.id 
-                        ? 'border-lilac-500 bg-lilac-50/50' 
-                        : 'border-lilac-100 hover:border-lilac-300 hover:bg-lilac-50/30'
-                    }`}
-                  >
-                    <div>
-                      <h3 className="font-medium text-white text-left text-lg">{service.name || 'Unnamed Service'}</h3>
-                      <p className="text-sm text-text-muted text-left mt-1">{service.durationMinutes} min</p>
+      <Card className="min-h-[400px]">
+        {step === 1 && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+            <h2 className="text-2xl font-serif text-white mb-6">1. Escolha o Serviço</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {services.map(s => (
+                <div key={s.id} onClick={() => setSelectedService(s.id)} className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${selectedService === s.id ? 'border-accent-pink bg-accent-pink/10' : 'border-border-theme hover:border-accent-pink/50 bg-[#2a1d35]'}`}>
+                  <h3 className="font-bold text-white mb-1">{s.name}</h3>
+                  <p className="text-text-muted text-sm">{s.durationMinutes} min • {s.price} MZN</p>
+                </div>
+              ))}
+            </div>
+            <Button className="mt-8" fullWidth disabled={!selectedService} onClick={() => setStep(2)}>Próximo</Button>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+            <h2 className="text-2xl font-serif text-white mb-6">2. Escolha o Profissional</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {profsForService.map(p => (
+                <div key={p.id} onClick={() => setSelectedProf(p.id)} className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4 ${selectedProf === p.id ? 'border-accent-pink bg-accent-pink/10' : 'border-border-theme hover:border-accent-pink/50 bg-[#2a1d35]'}`}>
+                  <img src={p.photoUrl} alt={p.name} className="w-12 h-12 rounded-full object-cover" />
+                  <h3 className="font-bold text-white">{p.name}</h3>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-4 mt-8">
+              <Button variant="outline" onClick={() => setStep(1)}>Voltar</Button>
+              <Button fullWidth disabled={!selectedProf} onClick={() => setStep(3)}>Próximo</Button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+            <h2 className="text-2xl font-serif text-white mb-6">3. Data e Hora</h2>
+            <div>
+              <p className="mb-2 font-medium text-text-muted text-sm uppercase tracking-wider">Data</p>
+              <div className="flex gap-2 overflow-x-auto pb-4">
+                {dates.map((d, i) => {
+                  const ds = d.toISOString().split('T')[0];
+                  return (
+                    <div key={i} onClick={() => { setSelectedDate(ds); setSelectedTime(''); }} className={`shrink-0 p-3 rounded-xl border-2 cursor-pointer text-center min-w-[80px] transition-all ${selectedDate === ds ? 'border-accent-pink bg-accent-pink/10 text-white' : 'border-border-theme bg-[#2a1d35] text-text-muted hover:border-accent-pink/50'}`}>
+                      <p className="text-xs">{format(d, 'eee')}</p>
+                      <p className="text-xl font-bold">{format(d, 'dd')}</p>
                     </div>
-                    <span className="font-bold text-accent-pink text-lg bg-[#334155] px-3 py-1.5 rounded-xl border border-[#475569]">
-                      {(service.price).toLocaleString('pt-MZ', { style: 'currency', currency: 'MZN' })}
-                    </span>
-                  </button>
-                ))}
+                  )
+                })}
               </div>
-            </motion.div>
-          )}
-
-          {/* Step 2: Professional */}
-          {step === 2 && (
-            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex-1">
-              <h2 className="text-xl font-serif text-gray-800 mb-6 flex items-center gap-2">
-                <User className="w-5 h-5 text-lilac-500" /> Escolha a profissional
-              </h2>
-              <div className="grid gap-4">
-                {availableProfessionals.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Nenhuma profissional disponível para este serviço no momento.</p>
-                ) : (
-                  availableProfessionals.map(prof => (
-                    <button
-                      key={prof.id}
-                      onClick={() => {
-                        setSelectedProfId(prof.id);
-                        setSelectedDate(null);
-                        setSelectedTime('');
-                      }}
-                      className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all ${
-                        selectedProfId === prof.id 
-                          ? 'border-lilac-500 bg-lilac-50/50' 
-                          : 'border-lilac-100 hover:border-lilac-300 hover:bg-lilac-50/30'
-                      }`}
-                    >
-                      <img src={prof.photoUrl} alt={prof.name} className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm" />
-                      <div>
-                        <h3 className="font-medium text-gray-900 text-left text-lg">{prof.name}</h3>
-                      </div>
-                    </button>
-                  ))
-                )}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 3: Date & Time */}
-          {step === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex-1">
-              <h2 className="text-xl font-serif text-gray-800 mb-6 flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-lilac-500" /> Quando você quer vir?
-              </h2>
-              
-              <div className="mb-6">
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Data</label>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                  {upcomingDays.map(date => {
-                    const isAvailable = selectedProf?.availability.days.includes(date.getDay());
-                    const isSelected = selectedDate && isSameDay(date, selectedDate);
-                    
-                    return (
-                      <button
-                        key={date.toISOString()}
-                        disabled={!isAvailable}
-                        onClick={() => { setSelectedDate(date); setSelectedTime(''); }}
-                        className={`flex flex-col items-center justify-center min-w-[72px] h-[88px] rounded-2xl border-2 transition-all ${
-                          !isAvailable ? 'opacity-40 cursor-not-allowed border-gray-100' :
-                          isSelected ? 'border-lilac-500 bg-lilac-500 text-white shadow-md shadow-lilac-200' : 'border-lilac-100 hover:border-lilac-300 text-gray-700'
-                        }`}
-                      >
-                        <span className={`text-xs uppercase font-medium ${isSelected ? 'text-lilac-100' : 'text-gray-500'}`}>
-                          {format(date, 'E', { locale: ptBR }).replace('.', '')}
-                        </span>
-                        <span className="text-2xl font-serif mt-1">{format(date, 'd')}</span>
-                      </button>
-                    );
-                  })}
+            </div>
+            {selectedDate && (
+              <div>
+                <p className="mb-2 font-medium text-text-muted text-sm uppercase tracking-wider">Hora</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {times.map((t) => (
+                    <div key={t} onClick={() => setSelectedTime(t)} className={`p-2 rounded-xl border-2 cursor-pointer text-center transition-all ${selectedTime === t ? 'border-accent-pink bg-accent-pink/10 text-white font-bold' : 'border-border-theme bg-[#2a1d35] text-text-muted hover:border-accent-pink/50'}`}>
+                      {t}
+                    </div>
+                  ))}
                 </div>
               </div>
+            )}
+            <div className="flex gap-4 mt-8">
+              <Button variant="outline" onClick={() => setStep(2)}>Voltar</Button>
+              <Button fullWidth disabled={!selectedDate || !selectedTime} onClick={() => setStep(4)}>Próximo</Button>
+            </div>
+          </div>
+        )}
 
-              {selectedDate && (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">Horário</label>
-                  {availableSlots.length > 0 ? (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                      {availableSlots.map(slot => (
-                        <button
-                          key={slot}
-                          onClick={() => setSelectedTime(slot)}
-                          className={`py-2 px-3 rounded-xl border-2 font-medium text-sm transition-all ${
-                            selectedTime === slot
-                              ? 'border-lilac-500 bg-lilac-50 text-lilac-700'
-                              : 'border-lilac-100 text-gray-600 hover:border-lilac-300 hover:bg-lilac-50/50'
-                          }`}
-                        >
-                          {slot}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-red-500 bg-red-50 p-4 rounded-2xl">
-                      Nenhum horário disponível para esta data. Por favor, selecione outro dia.
-                    </p>
-                  )}
-                </motion.div>
-              )}
-            </motion.div>
-          )}
+        {step === 4 && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+            <h2 className="text-2xl font-serif text-white mb-6">4. Seus Dados</h2>
+            <Input label="Seu Nome Completo" value={clientData.name} onChange={e => setClientData({...clientData, name: e.target.value})} />
+            <Input label="Seu Telefone" value={clientData.phone} onChange={e => setClientData({...clientData, phone: e.target.value})} />
+            
+            <div className="bg-[#2a1d35] p-4 rounded-xl border border-border-theme mt-6">
+              <h3 className="font-bold text-white mb-2">Resumo:</h3>
+              <p className="text-sm text-text-muted">{services.find(s=>s.id===selectedService)?.name} com {professionals.find(p=>p.id===selectedProf)?.name}</p>
+              <p className="text-sm text-text-muted">{selectedDate ? format(parseISO(selectedDate), 'dd/MM/yyyy') : ''} às {selectedTime}</p>
+            </div>
 
-          {/* Step 4: Details */}
-          {step === 4 && (
-            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex-1">
-              <h2 className="text-xl font-serif text-gray-800 mb-6 flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-lilac-500" /> Praticamente pronto
-              </h2>
-              
-              <div className="bg-[#1e293b] border border-[#475569] rounded-2xl p-6 mb-6">
-                <h3 className="font-serif text-white mb-4 text-lg">Resumo da Reserva</h3>
-                <div className="space-y-3 text-text-muted">
-                  <p className="flex justify-between items-center bg-[#334155] p-3 rounded-xl">
-                    <strong className="text-white text-sm uppercase tracking-wider">Tratamento:</strong> 
-                    <span className="text-white font-medium">{selectedService?.name || 'Unnamed Service'}</span>
-                  </p>
-                  <p className="flex justify-between items-center bg-[#334155] p-3 rounded-xl">
-                    <strong className="text-white text-sm uppercase tracking-wider">Especialista:</strong> 
-                    <span className="text-white font-medium">{selectedProf?.name}</span>
-                  </p>
-                  <p className="flex justify-between items-center bg-[#334155] p-3 rounded-xl">
-                    <strong className="text-white text-sm uppercase tracking-wider">Data & Hora:</strong> 
-                    <span className="text-accent-pink font-bold">{selectedDate ? format(selectedDate, "dd 'de' MMMM", { locale: ptBR }) : ''} às {selectedTime}</span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <Input 
-                  label="Seu Nome Completo" 
-                  placeholder="Maria Silva"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                />
-                <Input 
-                  label="Número de Telefone" 
-                  placeholder="+258 84 123 4567"
-                  type="tel"
-                  value={clientPhone}
-                  onChange={(e) => setClientPhone(e.target.value)}
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {error && <p className="text-red-500 text-sm mt-4 text-center">{error}</p>}
-
-        <div className="mt-8 flex gap-3 pt-6 border-t border-lilac-50 mt-auto">
-          {step > 1 && (
-            <Button variant="outline" onClick={handleBack} className="block w-24">
-              Voltar
-            </Button>
-          )}
-          <Button fullWidth onClick={handleNext}>
-            {step === 4 ? 'Confirmar Agendamento' : 'Continuar'}
-          </Button>
-        </div>
-      </AnimatedCard>
+            <div className="flex gap-4 mt-8">
+              <Button variant="outline" onClick={() => setStep(3)}>Voltar</Button>
+              <Button fullWidth disabled={!clientData.name || !clientData.phone} onClick={handleComplete}>Confirmar Reserva</Button>
+            </div>
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

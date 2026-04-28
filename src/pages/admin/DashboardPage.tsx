@@ -1,105 +1,54 @@
-import React from 'react';
 import { useAppStore } from '../../store/AppContext';
-import { Card, AnimatedCard } from '../../components/ui/Card';
-import { Users, Scissors, CalendarCheck, TrendingUp } from 'lucide-react';
-import { format, isToday, parse } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { cn } from '../../lib/utils';
+import { Card } from '../../components/ui/Card';
+import { Appointment } from '../../types';
+import { format, parseISO, isToday } from 'date-fns';
 
 export default function DashboardPage() {
-  const { professionals, services, appointments } = useAppStore();
+  const { appointments, services, professionals } = useAppStore();
 
-  const todayAppointments = appointments.filter(a => {
-    try {
-      const date = parse(a.date, 'yyyy-MM-dd', new Date());
-      return isToday(date) && a.status === 'confirmed';
-    } catch {
-      return false;
-    }
-  });
-
-  const stats = [
-    { label: 'Hoje', value: todayAppointments.length, icon: CalendarCheck },
-    { label: 'Tot. Profissionais', value: professionals.length, icon: Users },
-    { label: 'Tot. Serviços', value: services.length, icon: Scissors },
-    { label: 'Agendamentos', value: appointments.filter(a => a.status === 'confirmed').length, icon: TrendingUp },
-  ];
+  const todayAppointments = appointments.filter(a => isToday(parseISO(a.date)));
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
-        <div>
-          <p className="text-sm text-text-muted mb-1">Bem-vinda de volta,</p>
-          <h1 className="text-[42px] leading-none font-serif font-bold text-deep-purple">Painel de Controle</h1>
-        </div>
-
-        <div className="flex gap-6">
-          {stats.map((stat, i) => (
-            <div key={stat.label} className="text-right">
-              <span className="block text-[24px] font-bold text-accent-pink">{stat.value}</span>
-              <span className="text-[11px] uppercase tracking-[0.1em] text-text-muted">{stat.label}</span>
-            </div>
-          ))}
-        </div>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-serif font-bold text-white mb-6">Painel de Controle</h1>
+      <div className="grid sm:grid-cols-3 gap-6">
+        <Card>
+          <h3 className="text-text-muted text-sm uppercase font-bold tracking-wider mb-2">Reservas Hoje</h3>
+          <p className="text-4xl font-serif font-bold text-accent-pink">{todayAppointments.length}</p>
+        </Card>
+        <Card>
+          <h3 className="text-text-muted text-sm uppercase font-bold tracking-wider mb-2">Total Serviços</h3>
+          <p className="text-4xl font-serif font-bold text-accent-pink">{services.length}</p>
+        </Card>
+        <Card>
+          <h3 className="text-text-muted text-sm uppercase font-bold tracking-wider mb-2">Membros Equipe</h3>
+          <p className="text-4xl font-serif font-bold text-accent-pink">{professionals.length}</p>
+        </Card>
       </div>
-
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="flex-1 space-y-8">
-          <div>
-            <div className="font-serif italic text-[20px] mb-5 text-deep-purple">Agenda de Hoje</div>
-            <Card className="p-0 overflow-hidden">
-              {todayAppointments.length === 0 ? (
-                <div className="p-8 text-center text-text-muted">
-                  Nenhum agendamento confirmado para hoje.
+      <Card>
+        <h2 className="text-xl font-serif font-bold text-white mb-4">Agenda de Hoje</h2>
+        {todayAppointments.length === 0 ? (
+          <p className="text-text-muted">Nenhuma reserva para hoje.</p>
+        ) : (
+          <div className="space-y-4">
+            {todayAppointments.map(appt => {
+              const service = services.find(s => s.id === appt.serviceId);
+              return (
+                <div key={appt.id} className="flex justify-between items-center p-4 bg-[#2a1d35] rounded-xl border border-border-theme">
+                  <div>
+                    <h4 className="font-bold text-white">{appt.clientName}</h4>
+                    <p className="text-sm text-text-muted">{service?.name || 'Serviço removido'}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-accent-pink">{appt.time}</p>
+                    <p className="text-xs uppercase px-2 py-1 bg-[#1c1524] rounded-full inline-block mt-1">{appt.status}</p>
+                  </div>
                 </div>
-              ) : (
-                <div className="p-6 flex flex-col gap-4">
-                  {todayAppointments.map((appt, i) => {
-                    const service = services.find(s => s.id === appt.serviceId);
-                    const prof = professionals.find(p => p.id === appt.professionalId);
-                    
-                    return (
-                      <div key={appt.id} className={cn(
-                        "flex items-center p-3 rounded-[16px]",
-                        i % 2 === 0 ? "bg-[#334155] border-l-4 border-l-accent-pink" : "bg-[#1e293b] border border-border-theme"
-                      )}>
-                        <div className="w-[70px] font-bold text-[14px] text-accent-pink">
-                          {appt.time}
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-semibold text-white text-[15px]">{appt.clientName}</div>
-                          <div className="text-[12px] text-text-muted">{service?.name || 'Unnamed Service'}</div>
-                        </div>
-                        <div className="text-[12px] italic text-deep-purple">
-                          {prof?.name}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </Card>
+              );
+            })}
           </div>
-        </div>
-
-        <div className="w-full lg:w-[340px] space-y-8">
-          <div>
-            <div className="font-serif italic text-[20px] mb-5 text-deep-purple">Nossas Especialistas</div>
-            <Card className="bg-[#1e293b]">
-               <div className="grid grid-cols-2 gap-4">
-                 {professionals.map(p => (
-                   <div key={p.id} className="flex items-center gap-2.5 p-2 bg-[#334155] rounded-[50px] text-[13px] text-white">
-                     <div className="w-8 h-8 rounded-full bg-accent-pink flex items-center justify-center text-white font-bold text-[12px] overflow-hidden shrink-0">
-                       <img src={p.photoUrl} alt={p.name} className="w-full h-full object-cover" />
-                     </div>
-                     <span className="truncate leading-tight font-medium">{p.name.split(' ')[0]}</span>
-                   </div>
-                 ))}
-               </div>
-            </Card>
-          </div>
-        </div>
-      </div>
+        )}
+      </Card>
     </div>
   );
 }

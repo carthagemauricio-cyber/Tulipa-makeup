@@ -1,53 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Georgia", serif;
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  
-  --color-soft-lilac: #f3e8ff;
-  --color-pastel-pink: #fce7f3;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+
   --color-accent-pink: #d946ef;
-  --color-deep-purple: #fbcfe8;
-  --color-white: #ffffff;
+  --color-deep-purple: #701a75;
   --color-text-main: #fce7f3;
   --color-text-muted: #e879f9;
-  --color-border-theme: #4c1d95;
-
-  /* Dark theme overrides */
-  --color-bg-base: #1e293b;
-  --color-bg-card: #334155;
+  --color-border-theme: #3b2856;
+  --color-bg-base: #110e15;
+  --color-bg-card: #1c1524;
 }
 
 @layer utilities {
-  .scrollbar-hide {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
-  }
-
   .bg-sidebar-grad {
-    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-  }
-
-  .bg-main-grad {
-    background: var(--color-bg-base) radial-gradient(circle at top right, rgba(217, 70, 239, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at bottom left, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
+    background: linear-gradient(180deg, #20132b 0%, #150a1c 100%);
   }
 }
 
-@layer base {
-  body {
-    background-color: var(--color-bg-base);
-    color: var(--color-text-main);
-    font-family: var(--font-sans);
-  }
-
-  
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-serif);
-    color: var(--color-deep-purple);
-  }
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-main);
+  font-family: var(--font-sans);
 }

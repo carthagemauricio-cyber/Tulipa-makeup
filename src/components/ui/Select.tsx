@@ -1,55 +1,40 @@
-import React from 'react';
-import { cn } from '../../lib/utils';
-import { ChevronDown } from 'lucide-react';
+import * as React from "react"
+import { cn } from "../../lib/utils"
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
-  error?: string;
   options: { value: string; label: string }[];
-  placeholder?: string;
 }
 
-export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, options, placeholder, ...props }, ref) => {
+const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+  ({ className, label, options, ...props }, ref) => {
     return (
-      <div className="w-full">
-        {label && (
-          <label className="block text-[12px] font-semibold uppercase tracking-wider text-text-muted mb-2">
-            {label}
-          </label>
-        )}
+      <div className="w-full space-y-2">
+        {label && <label className="text-sm font-medium text-text-main block">{label}</label>}
         <div className="relative">
           <select
-            ref={ref}
             className={cn(
-              "flex w-full appearance-none rounded-xl border border-border-theme bg-[#334155] px-[18px] py-[14px] pr-10 text-sm transition-all duration-300 hover:border-accent-pink/50 focus:outline-none focus:border-accent-pink focus:bg-[#475569] focus:ring-[3px] focus:ring-accent-pink/20 focus:shadow-[0_0_15px_rgba(217,70,239,0.2)] focus:-translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-50",
-              !props.value && "text-text-muted/60",
-              props.value && "text-white",
-              error && "border-red-300 focus:border-red-400 focus:ring-red-400/20 focus:shadow-none",
+              "flex w-full appearance-none rounded-xl border border-border-theme bg-[#2a1d35] px-4 py-3 text-sm text-white focus:outline-none focus:border-accent-pink disabled:opacity-50",
               className
             )}
+            ref={ref}
             {...props}
           >
-            {placeholder && (
-              <option value="" disabled hidden>
-                {placeholder}
-              </option>
-            )}
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value} className="text-text-main">
-                {opt.label}
-              </option>
+            <option value="" disabled>Selecione...</option>
+            {options.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-text-muted">
-            <ChevronDown className="h-4 w-4" />
+          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
+            <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
         </div>
-        {error && (
-          <p className="mt-1 text-sm text-red-500">{error}</p>
-        )}
       </div>
-    );
+    )
   }
-);
-Select.displayName = "Select";
+)
+Select.displayName = "Select"
+
+export { Select }
